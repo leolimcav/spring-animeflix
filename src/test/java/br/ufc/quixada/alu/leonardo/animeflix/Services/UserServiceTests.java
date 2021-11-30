@@ -1,19 +1,25 @@
 package br.ufc.quixada.alu.leonardo.animeflix.Services;
 
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.internal.matchers.Any;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import br.ufc.quixada.alu.leonardo.animeflix.Dto.UserDTO;
 import br.ufc.quixada.alu.leonardo.animeflix.Models.User;
+import br.ufc.quixada.alu.leonardo.animeflix.Repositories.UserRepository;
 
-import static org.mockito.Mockito.when;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
-@SpringBootTest(classes = { UserService.class })
+import java.util.UUID;
+
+@SpringBootTest(classes = { UserService.class, UserRepository.class })
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
 class UserServiceTests {
@@ -21,12 +27,26 @@ class UserServiceTests {
   @Autowired
   private UserService userService;
 
+  @MockBean
+  private UserRepository userRepository;
+
   @Test
   void ShouldCreateNewUser() {
-    var user = new User("Leo");
+    var userDTO = new UserDTO();
+    userDTO.setName("Leo");
+    userDTO.setEmail("leonardo123k@gmail.com");
+    userDTO.setPassword("12345");
 
-    var createdUser = userService.create(user);
+    var user = new User();
+    user.setId(UUID.randomUUID());
+    user.setName(userDTO.getName());
+    user.setEmail(userDTO.getEmail());
+    user.setPassword(userDTO.getPassword());
 
-    assertTrue(createdUser.getName().equals(user.getName()));
+    when(userRepository.save(any(User.class))).thenReturn(user);
+
+    var createdUser = userService.create(userDTO);
+
+    assertThat(createdUser.getId().toString()).isEqualTo(user.getId().toString());
   }
 }

@@ -1,12 +1,26 @@
 package br.ufc.quixada.alu.leonardo.animeflix.Services;
 
-import br.ufc.quixada.alu.leonardo.animeflix.Interfaces.Services.IUserService;
+import java.util.UUID;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import br.ufc.quixada.alu.leonardo.animeflix.Dto.UserDTO;
 import br.ufc.quixada.alu.leonardo.animeflix.Models.User;
+import br.ufc.quixada.alu.leonardo.animeflix.Repositories.UserRepository;
 
-public class UserService implements IUserService {
+@Service
+public class UserService {
 
-  @Override
-  public User create(User user) {
-    return new User(user.getName());
+  @Autowired
+  private UserRepository userRepository;
+
+  public User create(UserDTO userDTO) {
+    var user = User.builder().name(userDTO.getName()).email(userDTO.getEmail())
+        .password(userDTO.getPassword()).build();
+
+    var createdUser = userRepository.save(user);
+
+    return createdUser;
   }
 }

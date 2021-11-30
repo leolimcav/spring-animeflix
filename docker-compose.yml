@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=animeflixdb
+    ports:
+      - "5432:5432"
+    container_name: animeflixdb
+    networks:
+      - animeflixnetwork
+
+networks:
+  animeflixnetwork:
+    driver: bridge
