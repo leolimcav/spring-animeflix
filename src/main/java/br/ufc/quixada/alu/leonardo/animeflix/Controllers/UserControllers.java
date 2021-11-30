@@ -1,6 +1,6 @@
 package br.ufc.quixada.alu.leonardo.animeflix.Controllers;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,8 +23,8 @@ public class UserControllers {
   private UserService userService;
 
   @GetMapping("/")
-  public ResponseEntity<ArrayList<User>> index() {
-    return new ResponseEntity<ArrayList<User>>(userService.index(), HttpStatus.ACCEPTED);
+  public ResponseEntity<List<User>> index() {
+    return new ResponseEntity<List<User>>(userService.index(), HttpStatus.ACCEPTED);
   }
 
   @PostMapping("/")

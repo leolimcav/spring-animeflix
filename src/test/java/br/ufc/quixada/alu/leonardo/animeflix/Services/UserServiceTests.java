@@ -2,7 +2,6 @@ package br.ufc.quixada.alu.leonardo.animeflix.Services;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.internal.matchers.Any;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import java.util.ArrayList;
 import java.util.UUID;
 
 @SpringBootTest(classes = { UserService.class, UserRepository.class })
@@ -48,5 +48,15 @@ class UserServiceTests {
     var createdUser = userService.create(userDTO);
 
     assertThat(createdUser.getId().toString()).isEqualTo(user.getId().toString());
+  }
+
+  @Test
+  void ShouldListAllUsers() {
+    var user = new User();
+    var userList = new ArrayList<User>();
+    userList.add(user);
+    when(userRepository.findAll()).thenReturn(userList);
+
+    assertThat(userList).hasOnlyElementsOfType(User.class);
   }
 }

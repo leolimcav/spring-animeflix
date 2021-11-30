@@ -1,6 +1,7 @@
 package br.ufc.quixada.alu.leonardo.animeflix.Services;
 
-import java.util.UUID;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,5 +23,11 @@ public class UserService {
     var createdUser = userRepository.save(user);
 
     return createdUser;
+  }
+
+  public List<User> index() {
+    List<User> users = new ArrayList<User>();
+    users = userRepository.findAll();
+    return users;
   }
 }
