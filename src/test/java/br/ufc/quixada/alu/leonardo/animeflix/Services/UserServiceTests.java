@@ -52,11 +52,12 @@ class UserServiceTests {
 
   @Test
   void ShouldListAllUsers() {
-    var user = new User();
     var userList = new ArrayList<User>();
-    userList.add(user);
     when(userRepository.findAll()).thenReturn(userList);
 
-    assertThat(userList).hasOnlyElementsOfType(User.class);
+    var index = userService.index();
+    assertThat(index).hasOnlyElementsOfType(User.class);
+    assertThat(index).isInstanceOf(ArrayList.class);
+    assertThat(index).hasSizeGreaterThanOrEqualTo(0);
   }
 }
