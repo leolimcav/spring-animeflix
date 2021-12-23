@@ -5,6 +5,7 @@ import br.ufc.quixada.alu.leonardo.animeflix.Dto.UpdateUserDTO;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -115,5 +116,18 @@ class UserServiceTests {
     var updatedUser = userService.update(uuid, updateUserDTO);
 
     assertThat(updatedUser.getMessage()).isEqualTo("User not found");
+  }
+
+  @Test
+  @DisplayName("It should delete user with provided UUID")
+  void ShouldDeleteUserWithProvidedUUID() {
+    var uuid = UUID.randomUUID();
+
+    when(userRepository.existsById(uuid)).thenReturn(true);
+    doNothing().when(userRepository).deleteById(uuid);
+
+    var deletedUser = userService.delete(uuid);
+
+    assertThat(deletedUser.getMessage()).isEqualTo("User deleted");
   }
 }

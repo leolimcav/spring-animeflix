@@ -47,6 +47,10 @@ public class UserControllers {
   public ResponseEntity<BaseResponseDTO<UserDTO>> create(@RequestBody @Validated CreateUserDTO createUserDTO) {
     var createdUser = userService.create(createUserDTO);
 
+    if(createdUser.isError()) {
+      return ResponseEntity.badRequest().body(createdUser);
+    }
+
     return ResponseEntity.created(URI.create("/users/"+((UserDTO)createdUser.getBody()).getId())).body(createdUser);
   }
 
@@ -60,6 +64,24 @@ public class UserControllers {
           @ApiResponse(message = "Server with issues to respond", code = 500, response = String.class)})
   public ResponseEntity<BaseResponseDTO<UserDTO>> update(@PathVariable("uuid") UUID id, @RequestBody @Validated UpdateUserDTO updateUserDTO) {
     var updatedUser = userService.update(id, updateUserDTO);
+    if(updatedUser.isError()) {
+      return ResponseEntity.notFound().build();
+    }
     return ResponseEntity.ok(updatedUser);
+  }
+
+  @DeleteMapping("/{uuid}")
+  @ApiOperation("Delete User")
+  @ApiResponses(value = {
+          @ApiResponse(message = "Delete the user", code = 200, response = UserDTO.class),
+          @ApiResponse(message = "Not authorized to perform this action", code = 401, response = String.class),
+          @ApiResponse(message = "User not found with this UUID", code = 404, response = String.class),
+          @ApiResponse(message = "Server with issues to respond", code = 500, response = String.class)})
+  public ResponseEntity<BaseResponseDTO<UserDTO>> delete(@PathVariable("uuid") UUID id) {
+    var response = userService.delete(id);
+    if(response.isError()) {
+      return ResponseEntity.notFound().build();
+    }
+    return ResponseEntity.ok(response);
   }
 }

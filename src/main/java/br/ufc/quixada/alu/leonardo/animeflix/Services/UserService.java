@@ -83,4 +83,23 @@ public class UserService {
 
       return baseResponse;
   }
+
+  public BaseResponseDTO<UserDTO> delete(UUID id) {
+      var baseResponse = new BaseResponseDTO<UserDTO>();
+      var userExists = userRepository.existsById(id);
+
+      if(!userExists) {
+          baseResponse.setBody(UserDTO.builder().build());
+          baseResponse.setError(true);
+          baseResponse.setMessage("User not exists");
+          return baseResponse;
+      }
+
+      userRepository.deleteById(id);
+
+      baseResponse.setMessage("User deleted");
+      baseResponse.setBody(UserDTO.builder().build());
+
+      return baseResponse;
+  }
 }
