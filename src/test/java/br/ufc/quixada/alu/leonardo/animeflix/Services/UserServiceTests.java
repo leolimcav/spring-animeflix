@@ -1,5 +1,7 @@
 package br.ufc.quixada.alu.leonardo.animeflix.Services;
 
+import br.ufc.quixada.alu.leonardo.animeflix.Dto.CreateUserDTO;
+import br.ufc.quixada.alu.leonardo.animeflix.Dto.UpdateUserDTO;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,20 +37,20 @@ class UserServiceTests {
   @Test
   @DisplayName("It should create a new user")
   void ShouldCreateNewUser() {
-    var userDTO = new UserDTO();
-    userDTO.setName("Leo");
-    userDTO.setEmail("leonardo123k@gmail.com");
-    userDTO.setPassword("12345");
+    var createUserDTO = new CreateUserDTO();
+    createUserDTO.setName("Leo");
+    createUserDTO.setEmail("leonardo123k@gmail.com");
+    createUserDTO.setPassword("12345");
 
     var user = new User();
     user.setId(UUID.randomUUID());
-    user.setName(userDTO.getName());
-    user.setEmail(userDTO.getEmail());
-    user.setPassword(userDTO.getPassword());
+    user.setName(createUserDTO.getName());
+    user.setEmail(createUserDTO.getEmail());
+    user.setPassword(createUserDTO.getPassword());
 
     when(userRepository.save(any(User.class))).thenReturn(user);
 
-    var createdUser = userService.create(userDTO);
+    var createdUser = userService.create(createUserDTO);
 
     assertThat(createdUser.getId().toString()).isEqualTo(user.getId().toString());
   }
@@ -60,7 +62,7 @@ class UserServiceTests {
     when(userRepository.findAll()).thenReturn(userList);
 
     var index = userService.index();
-    assertThat(index).hasOnlyElementsOfType(User.class);
+    assertThat(index).hasOnlyElementsOfType(UserDTO.class);
     assertThat(index).isInstanceOf(ArrayList.class);
     assertThat(index).hasSizeGreaterThanOrEqualTo(0);
   }
@@ -75,7 +77,7 @@ class UserServiceTests {
     user.setName("User Name");
     when(userRepository.save(user)).thenReturn(user);
 
-    var updateUserDTO = new UserDTO();
+    var updateUserDTO = new UpdateUserDTO();
     updateUserDTO.setName(user.getName());
     updateUserDTO.setEmail(user.getEmail());
     updateUserDTO.setPassword(user.getPassword());
