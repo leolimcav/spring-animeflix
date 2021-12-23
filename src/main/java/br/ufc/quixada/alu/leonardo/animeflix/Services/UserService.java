@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import br.ufc.quixada.alu.leonardo.animeflix.Dto.BaseResponseDTO;
 import br.ufc.quixada.alu.leonardo.animeflix.Dto.CreateUserDTO;
 import br.ufc.quixada.alu.leonardo.animeflix.Dto.UpdateUserDTO;
 import org.slf4j.Logger;
@@ -24,15 +25,25 @@ public class UserService {
 
   public List<UserDTO> index() {
     var users = userRepository.findAll();
-
     List<UserDTO> userDtoList = new ArrayList<>();
     for (var user : users) {
       userDtoList.add(UserDTO.builder().id(user.getId()).name(user.getName()).email(user.getEmail()).build());
     }
+
     return userDtoList;
   }
 
-  public UserDTO create(CreateUserDTO createUserDTO) {
+  public BaseResponseDTO<UserDTO> create(CreateUserDTO createUserDTO) {
+    var userAlreadyExists = userRepository.existsByEmail(createUserDTO.getEmail());
+    var baseResponse = new BaseResponseDTO<UserDTO>();
+    if(userAlreadyExists) {
+      baseResponse.setMessage("Email already exists");
+      baseResponse.setBody(UserDTO.builder().build());
+      baseResponse.setError(true);
+
+      return baseResponse;
+    }
+
     var user = User.builder().name(createUserDTO.getName()).email(createUserDTO.getEmail())
         .password(createUserDTO.getPassword()).build();
 
@@ -40,11 +51,23 @@ public class UserService {
 
     var createdUserDto = UserDTO.builder().id(createdUser.getId()).name(createdUser.getName()).email(createdUser.getEmail()).build();
 
-    return createdUserDto;
+    baseResponse.setMessage("User created");
+    baseResponse.setBody(createdUserDto);
+
+    return baseResponse;
   }
 
-  public UserDTO update(UUID id, UpdateUserDTO updateUserDTO) throws Exception{
-    try {
+  public BaseResponseDTO<UserDTO> update(UUID id, UpdateUserDTO updateUserDTO) {
+      var baseResponse = new BaseResponseDTO<UserDTO>();
+      var userExists = userRepository.existsById(id);
+
+      if(!userExists) {
+        baseResponse.setError(true);
+        baseResponse.setMessage("User not found");
+        baseResponse.setBody(UserDTO.builder().build());
+
+        return baseResponse;
+      }
       var user = userRepository.getById(id);
 
       user.setName(updateUserDTO.getName());
@@ -55,10 +78,9 @@ public class UserService {
 
       var updatedUserDto = UserDTO.builder().id(updatedUser.getId()).name(updatedUser.getName()).email(updatedUser.getEmail()).build();
 
-      return updatedUserDto;
-    } catch (Exception ex) {
-      logger.error(ex.getMessage());
-      throw new Exception("User not found!");
-    }
+      baseResponse.setMessage("User updated");
+      baseResponse.setBody(updatedUserDto);
+
+      return baseResponse;
   }
 }

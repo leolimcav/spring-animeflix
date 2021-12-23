@@ -9,5 +9,5 @@ import br.ufc.quixada.alu.leonardo.animeflix.Models.User;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, UUID> {
-
+    boolean existsByEmail(String email);
 }

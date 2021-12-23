@@ -15,7 +15,6 @@ import br.ufc.quixada.alu.leonardo.animeflix.Dto.UserDTO;
 import br.ufc.quixada.alu.leonardo.animeflix.Models.User;
 import br.ufc.quixada.alu.leonardo.animeflix.Repositories.UserRepository;
 
-//import static org.junit.jupiter.api.Assertions.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -38,8 +37,8 @@ class UserServiceTests {
   @DisplayName("It should create a new user")
   void ShouldCreateNewUser() {
     var createUserDTO = new CreateUserDTO();
-    createUserDTO.setName("Leo");
-    createUserDTO.setEmail("leonardo123k@gmail.com");
+    createUserDTO.setName("user name");
+    createUserDTO.setEmail("useremail@email.com");
     createUserDTO.setPassword("12345");
 
     var user = new User();
@@ -52,7 +51,22 @@ class UserServiceTests {
 
     var createdUser = userService.create(createUserDTO);
 
-    assertThat(createdUser.getId().toString()).isEqualTo(user.getId().toString());
+    assertThat(createdUser.getBody().getId().toString()).isEqualTo(user.getId().toString());
+  }
+
+  @Test
+  @DisplayName("It should return error when try to create user with email that already exists")
+  void ShouldNotCreateUserWithRepeatedEmail() {
+    var createUserDTO = new CreateUserDTO();
+    createUserDTO.setName("user name");
+    createUserDTO.setEmail("alreadyexistemail@gmail.com");
+    createUserDTO.setPassword("12345");
+
+    when(userRepository.existsByEmail(createUserDTO.getEmail())).thenReturn(true);
+
+    var createdUser = userService.create(createUserDTO);
+
+    assertThat(createdUser.getMessage()).isEqualTo("Email already exists");
   }
 
   @Test
@@ -72,6 +86,7 @@ class UserServiceTests {
   void ShouldUpdateUserWithProvidedUUID() throws Exception{
     var uuid = UUID.randomUUID();
     var user = User.builder().id(uuid).name("user name").email("useremail@email.com").password("12345").build();
+    when(userRepository.existsById(uuid)).thenReturn(true);
     when(userRepository.getById(uuid)).thenReturn(user);
 
     user.setName("User Name");
@@ -83,6 +98,22 @@ class UserServiceTests {
     updateUserDTO.setPassword(user.getPassword());
     var updatedUser = userService.update(user.getId(), updateUserDTO);
 
-    assertThat(updatedUser.getId()).isEqualTo(user.getId());
+    assertThat(updatedUser.getBody().getId()).isEqualTo(user.getId());
+  }
+
+  @Test
+  @DisplayName("It should not update when the provided UUID not exists")
+  void ShouldNotUpdateWithInvalidUUID() {
+    var uuid = UUID.randomUUID();
+
+    when(userRepository.existsById(uuid)).thenReturn(false);
+
+    var updateUserDTO = new UpdateUserDTO();
+    updateUserDTO.setName("user name");
+    updateUserDTO.setEmail("useremail@email.com");
+    updateUserDTO.setPassword("123456");
+    var updatedUser = userService.update(uuid, updateUserDTO);
+
+    assertThat(updatedUser.getMessage()).isEqualTo("User not found");
   }
 }
