@@ -91,7 +91,7 @@ public class UserService {
       if(!userExists) {
           baseResponse.setBody(false);
           baseResponse.setError(true);
-          baseResponse.setMessage("User not exists");
+          baseResponse.setMessage("User not found");
           return baseResponse;
       }
 

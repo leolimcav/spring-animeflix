@@ -35,6 +35,18 @@ class UserServiceTests {
   private UserRepository userRepository;
 
   @Test
+  @DisplayName("It should list all created users")
+  void ShouldListAllUsers() {
+    var userList = new ArrayList<User>();
+    when(userRepository.findAll()).thenReturn(userList);
+
+    var index = userService.index();
+    assertThat(index).hasOnlyElementsOfType(UserDTO.class);
+    assertThat(index).isInstanceOf(ArrayList.class);
+    assertThat(index).hasSizeGreaterThanOrEqualTo(0);
+  }
+
+  @Test
   @DisplayName("It should create a new user")
   void ShouldCreateNewUser() {
     var createUserDTO = new CreateUserDTO();
@@ -56,7 +68,7 @@ class UserServiceTests {
   }
 
   @Test
-  @DisplayName("It should return error when try to create user with email that already exists")
+  @DisplayName("It should not create user with repeated email")
   void ShouldNotCreateUserWithRepeatedEmail() {
     var createUserDTO = new CreateUserDTO();
     createUserDTO.setName("user name");
@@ -68,18 +80,6 @@ class UserServiceTests {
     var createdUser = userService.create(createUserDTO);
 
     assertThat(createdUser.getMessage()).isEqualTo("Email already exists");
-  }
-
-  @Test
-  @DisplayName("It should list all created users")
-  void ShouldListAllUsers() {
-    var userList = new ArrayList<User>();
-    when(userRepository.findAll()).thenReturn(userList);
-
-    var index = userService.index();
-    assertThat(index).hasOnlyElementsOfType(UserDTO.class);
-    assertThat(index).isInstanceOf(ArrayList.class);
-    assertThat(index).hasSizeGreaterThanOrEqualTo(0);
   }
 
   @Test
@@ -129,5 +129,16 @@ class UserServiceTests {
     var deletedUser = userService.delete(uuid);
 
     assertThat(deletedUser.getMessage()).isEqualTo("User deleted");
+  }
+
+  @Test
+  @DisplayName("It should not delete user with invalid UUID")
+  void ShouldNotDeleteUserWithInvalidUUID() {
+    var uuid = UUID.randomUUID();
+
+    when(userRepository.existsById(uuid)).thenReturn(false);
+
+    var deletedUser = userService.delete(uuid);
+    assertThat(deletedUser.getMessage()).isEqualTo("User not found");
   }
 }
