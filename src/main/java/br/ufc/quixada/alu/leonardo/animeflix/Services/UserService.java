@@ -2,6 +2,7 @@ package br.ufc.quixada.alu.leonardo.animeflix.Services;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,12 @@ public class UserService {
   @Autowired
   private UserRepository userRepository;
 
+  public List<User> index() {
+    List<User> users;
+    users = userRepository.findAll();
+    return users;
+  }
+
   public User create(UserDTO userDTO) {
     var user = User.builder().name(userDTO.getName()).email(userDTO.getEmail())
         .password(userDTO.getPassword()).build();
@@ -25,9 +32,19 @@ public class UserService {
     return createdUser;
   }
 
-  public List<User> index() {
-    List<User> users = new ArrayList<User>();
-    users = userRepository.findAll();
-    return users;
+  public User update(UUID id, UserDTO updateUserDTO) throws Exception{
+    try {
+      var user = userRepository.getById(id);
+
+      user.setName(updateUserDTO.getName());
+      user.setEmail(updateUserDTO.getEmail());
+      user.setPassword(updateUserDTO.getPassword());
+
+      var updatedUser = userRepository.save(user);
+
+      return updatedUser;
+    } catch (Exception ex) {
+      throw new Exception("User not found!");
+    }
   }
 }
