@@ -77,7 +77,7 @@ public class UserControllers {
           @ApiResponse(message = "Not authorized to perform this action", code = 401, response = String.class),
           @ApiResponse(message = "User not found with this UUID", code = 404, response = String.class),
           @ApiResponse(message = "Server with issues to respond", code = 500, response = String.class)})
-  public ResponseEntity<BaseResponseDTO<UserDTO>> delete(@PathVariable("uuid") UUID id) {
+  public ResponseEntity<BaseResponseDTO<Boolean>> delete(@PathVariable("uuid") UUID id) {
     var response = userService.delete(id);
     if(response.isError()) {
       return ResponseEntity.notFound().build();

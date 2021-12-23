@@ -84,12 +84,12 @@ public class UserService {
       return baseResponse;
   }
 
-  public BaseResponseDTO<UserDTO> delete(UUID id) {
-      var baseResponse = new BaseResponseDTO<UserDTO>();
+  public BaseResponseDTO<Boolean> delete(UUID id) {
+      var baseResponse = new BaseResponseDTO<Boolean>();
       var userExists = userRepository.existsById(id);
 
       if(!userExists) {
-          baseResponse.setBody(UserDTO.builder().build());
+          baseResponse.setBody(false);
           baseResponse.setError(true);
           baseResponse.setMessage("User not exists");
           return baseResponse;
@@ -98,7 +98,7 @@ public class UserService {
       userRepository.deleteById(id);
 
       baseResponse.setMessage("User deleted");
-      baseResponse.setBody(UserDTO.builder().build());
+      baseResponse.setBody(false);
 
       return baseResponse;
   }
