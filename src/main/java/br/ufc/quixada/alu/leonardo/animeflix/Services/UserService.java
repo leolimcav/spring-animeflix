@@ -33,6 +33,19 @@ public class UserService {
     return userDtoList;
   }
 
+  public BaseResponseDTO<UserDTO> find(UUID uuid) {
+      var userExists = userRepository.findById(uuid);
+
+      if(userExists.isEmpty()) {
+          return new BaseResponseDTO<UserDTO>("User not found", null, true);
+      }
+
+      var user = userExists.get();
+      var userDTO = UserDTO.builder().id(user.getId()).name(user.getName()).email(user.getEmail()).build();
+
+      return new BaseResponseDTO<UserDTO>("User found", userDTO, false);
+  }
+
   public BaseResponseDTO<UserDTO> create(CreateUserDTO createUserDTO) {
     var userAlreadyExists = userRepository.existsByEmail(createUserDTO.getEmail());
     var baseResponse = new BaseResponseDTO<UserDTO>();

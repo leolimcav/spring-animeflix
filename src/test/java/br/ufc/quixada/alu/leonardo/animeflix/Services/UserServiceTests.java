@@ -5,7 +5,6 @@ import br.ufc.quixada.alu.leonardo.animeflix.Dto.UpdateUserDTO;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,6 +19,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.UUID;
 
 @SpringBootTest(classes = { UserService.class, UserRepository.class })
@@ -44,6 +44,28 @@ class UserServiceTests {
     assertThat(index).hasOnlyElementsOfType(UserDTO.class);
     assertThat(index).isInstanceOf(ArrayList.class);
     assertThat(index).hasSizeGreaterThanOrEqualTo(0);
+  }
+
+  @Test
+  @DisplayName("It should get user with the provided uuid")
+  void ShouldGetUserByUUID() {
+    var uuid = UUID.randomUUID();
+    var user = User.builder().id(uuid).build();
+    when(userRepository.findById(uuid)).thenReturn(Optional.of(user));
+    var response = userService.find(uuid);
+    var userFound = response.getBody();
+
+    assertThat(userFound.getId().toString()).isEqualTo(uuid.toString());
+  }
+
+  @Test
+  @DisplayName("It should return error when the user not found")
+  void ShouldReturnErrorWhenUserNotFound() {
+    var uuid = UUID.randomUUID();
+    when(userRepository.findById(uuid)).thenReturn(Optional.empty());
+    var response = userService.find(uuid);
+
+    assertThat(response.isError()).isTrue();
   }
 
   @Test
@@ -84,7 +106,7 @@ class UserServiceTests {
 
   @Test
   @DisplayName("It should update user with the provided UUID")
-  void ShouldUpdateUserWithProvidedUUID() throws Exception{
+  void ShouldUpdateUserWithProvidedUUID() {
     var uuid = UUID.randomUUID();
     var user = User.builder().id(uuid).name("user name").email("useremail@email.com").password("12345").build();
     when(userRepository.existsById(uuid)).thenReturn(true);

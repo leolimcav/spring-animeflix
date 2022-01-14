@@ -30,11 +30,27 @@ public class UserControllers {
   @GetMapping("/")
   @ApiOperation("List all users")
   @ApiResponses(value = {
-          @ApiResponse(message = "Returns the updated user", code = 200, response = List.class),
+          @ApiResponse(message = "Returns the list of all users", code = 200, response = List.class),
           @ApiResponse(message = "Not authorized to perform this action", code = 401, response = String.class),
           @ApiResponse(message = "Server with issues to respond", code = 500, response = String.class)})
   public ResponseEntity<List<UserDTO>> index() {
     return ResponseEntity.ok(userService.index());
+  }
+
+  @GetMapping("/{uuid}")
+  @ApiOperation("Get user by Id")
+  @ApiResponses(value = {
+          @ApiResponse(message = "Returns the user", code = 200, response = List.class),
+          @ApiResponse(message = "Not authorized to perform this action", code = 401, response = String.class),
+          @ApiResponse(message = "User not found", code = 404, response = String.class),
+          @ApiResponse(message = "Server with issues to respond", code = 500, response = String.class)})
+  public ResponseEntity<BaseResponseDTO<UserDTO>> find(@PathVariable(name = "uuid", required = true) UUID uuid) {
+    var response = userService.find(uuid);
+
+    if(response.isError()) {
+      return ResponseEntity.notFound().build();
+    }
+    return ResponseEntity.ok(response);
   }
 
   @PostMapping("/")
@@ -51,11 +67,11 @@ public class UserControllers {
       return ResponseEntity.badRequest().body(createdUser);
     }
 
-    return ResponseEntity.created(URI.create("/users/"+((UserDTO)createdUser.getBody()).getId())).body(createdUser);
+    return ResponseEntity.created(URI.create("/users/"+(createdUser.getBody()).getId())).body(createdUser);
   }
 
   @PutMapping("/{uuid}")
-  @ApiOperation("Update user info")
+  @ApiOperation("Update user info by Id")
   @ApiResponses(value = {
           @ApiResponse(message = "Returns the updated user", code = 200, response = UserDTO.class),
           @ApiResponse(message = "The info sent by the client not correspond to the expected type", code = 400, response = String.class),
@@ -71,7 +87,7 @@ public class UserControllers {
   }
 
   @DeleteMapping("/{uuid}")
-  @ApiOperation("Delete User")
+  @ApiOperation("Delete User by Id")
   @ApiResponses(value = {
           @ApiResponse(message = "Delete the user", code = 200, response = UserDTO.class),
           @ApiResponse(message = "Not authorized to perform this action", code = 401, response = String.class),
