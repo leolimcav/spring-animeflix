@@ -44,7 +44,7 @@ public class UserControllers {
           @ApiResponse(message = "Not authorized to perform this action", code = 401, response = String.class),
           @ApiResponse(message = "User not found", code = 404, response = String.class),
           @ApiResponse(message = "Server with issues to respond", code = 500, response = String.class)})
-  public ResponseEntity<BaseResponseDTO<UserDTO>> find(@PathVariable(name = "uuid", required = true) UUID uuid) {
+  public ResponseEntity<BaseResponseDTO<UserDTO>> find(@PathVariable(name = "uuid") UUID uuid) {
     var response = userService.find(uuid);
 
     if(response.isError()) {
